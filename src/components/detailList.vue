@@ -2,18 +2,18 @@
   <!--  日志的详情列表-->
   <div class="detail-list-container">
     <div class="list-th list-header">
-      <p class="list-column1">生成时间</p>
-      <p class="list-column2">网络类型</p>
-      <p class="list-column2">运营商</p>
-      <p class="list-column2">客户端</p>
-      <p class="list-column3">详细</p>
+      <p class="list-column1">{{ listHead[0] }}</p>
+      <p class="list-column2">{{ listHead[1] }}</p>
+      <p class="list-column2">{{ listHead[2] }}</p>
+      <p class="list-column2">{{ listHead[3] }}</p>
+      <p class="list-column3">{{ listHead[4] }}</p>
     </div>
     <div
-      v-for="(item, index) in listData.slice(0, 9)"
+      v-for="(item, index) in listData"
       :key="index"
       class="list-body"
     >
-      <div class="list-th" @click="showHide(index)">
+      <div class="list-th">
         <div class="list-column1">
           <p>{{ item[0] }}</p>
         </div>
@@ -26,18 +26,20 @@
         <div class="list-column2">
           <p>{{ item[3] }}</p>
         </div>
-        <div ref="listArrow" class="list-column3">
+        <!--        列表操作相关的改动区-->
+        <div v-if="listHead[4]!='操作'" ref="listArrow" class="list-column3" @click="showHide(index)">
           <div class="list-detail"></div>
         </div>
+        <div v-else class="list-column3 list-check" @click="goUserPath(index)">路径</div>
       </div>
-      <div ref="listDetail" style="display: none">
+      <div v-if="listHead[4]!='操作'" ref="listDetail" style="display: none">
         <detail-page
           :detail-data="itemData[index]"
           :detail-type="itemType"
         ></detail-page>
       </div>
     </div>
-    <Page :total="pageSize" show-sizer show-total />
+    <Page :total="pageSize" show-sizer show-total @on-change="changePage" />
   </div>
 </template>
 
@@ -55,10 +57,11 @@ export default {
   },
   data() {
     return {
-      //列表数据
+      listHead: [],
+      //列表数据(每10页展示）
       listData: [],
-      //传入详细页面的数据
-      // detailData:[],
+      //列表总数据
+      listDataAll: [],
       //展示详情页的是什么类型
       itemType: "",
       itemData: [],
@@ -79,9 +82,18 @@ export default {
       let key = this.detailType;
       this.itemData = JSON.parse(localStorage.getItem(key));
       this.itemType = key;
-      this.getList(this.itemData);
+      if (key === "userAnalysis") {
+        this.listHead = ["用户ID", "生成时间", "IP地址", "用户位置", "操作"];
+        this.listDataAll = this.itemData;
+        this.pageSize = this.listDataAll.length;
+      } else {
+        this.listHead = ["生成时间", "网络类型", "运营商", "客户端", "详细"];
+        this.getList(this.itemData);
+      }
       // this.getDetail();
       // console.log(key,this.itemData,'init成功');
+      //获取展示的前10页数据
+      this.changePage(1);
     },
     //只是列表
     getList(res) {
@@ -95,18 +107,17 @@ export default {
           data.client[1]
         ]);
       }
-      this.listData = item;
-      this.pageSize = this.listData.length;
+      this.listDataAll = item;
+      // this.listData = item;
+      this.pageSize = this.listDataAll.length;
       // console.log(this.listData,'getlist成功');
     },
-    // getDetail(){
-    //   let datas = this.itemData;
-    //   let item = [];
-    //   // for(let data of datas) {
-    //   //   item.push([data.date[1] , data.network[1] , data.operator[1] , data.client[1]]);
-    //   // }
-    //   this.listData = item;
-    // },
+    changePage(index) {
+      let end = Math.min(index * 10, this.pageSize);
+      let start = index * 10 - 10;
+      this.listData = this.listDataAll.slice(start, end);
+      console.log(start, end, this.listData);
+    },
     //折叠和翻转
     showHide(index) {
       // console.log(this.$refs.listArrow[0].style);
@@ -117,6 +128,9 @@ export default {
         this.$refs.listDetail[index].style.display = "none";
         this.$refs.listArrow[index].style.transform = "rotate(0deg)";
       }
+    },
+    goUserPath(index) {
+      this.$emit("changeTab");
     }
   },
   mounted() {
@@ -134,7 +148,7 @@ export default {
   //padding: 10px;
   width: 100%;
 
-  height: 510px;
+  height: 560px;
   overflow-y: scroll;
 
   .list-th {
@@ -143,17 +157,13 @@ export default {
     align-items: center;
     padding: 10px 20px;
     height: 45px;
-    color: @tit-color;
+    color: @font-color;
     //border-bottom: 1px solid gray;
     font-size: 16px;
-    //background-color: @list-head;
-    //font-size: 16px;
-    //font-weight: 500;
-    cursor: pointer;
   }
 
   .list-body {
-    border-bottom: 1px solid gray;
+    border-top: 1px solid gray;
 
     .list-detail {
       background: url("../assets/img/icon-arrow.png") no-repeat 30% 50%;
@@ -162,8 +172,8 @@ export default {
     }
   }
 
-  .list-body:nth-child(10) {
-    border-bottom: transparent;
+  .list-body:nth-child(2) {
+    border-top: transparent;
   }
 
   .list-column1 {
@@ -172,15 +182,20 @@ export default {
   }
 
   .list-column2 {
-    width: 18%;
+    width: 20%;
     text-align: center;
   }
 
   .list-column3 {
-    width: 4%;
+    width: 7%;
     text-align: center;
     display: flex;
     justify-content: center;
+    cursor: pointer;
+  }
+
+  .list-check {
+    color: @high-light-pink;
   }
 
   .list-header {

@@ -64,11 +64,17 @@ export default {
       mychart.setOption(this.options);
     },
     setOption() {
+      let label = "";
+      if (this.id === "user-base") {
+        label = "{name|总时长(min)}";
+      } else {
+        label = "{name|总次数(次)}";
+      }
       let option = {
         title: {
           //  显示总数
           zlevel: 0,
-          text: ["{name|总次数}", "{value|" + this.total + "}"].join("\n"),
+          text: [label, "{value|" + this.total + "}"].join("\n"),
 
           top: "center",
           left: "center",
@@ -163,35 +169,63 @@ export default {
       const mapping = {
         succPV: "成功次数",
         docPV: "次数",
-        succRate: "成功率"
+        succRate: "成功率",
+        visTime: "停留时间"
       };
       if (!this.cardList.itemList) {
         return;
       }
-      this.cardList.itemList.forEach((i) => {
-        total += i.docPV;
-      });
-      this.total = total;
-      this.cardList.itemList.forEach((val) => {
-        let value = {};
-        let rate = (val.succRate * 100).toFixed(2) + "%";
-        for (let key in val) {
-          if (key === "succRate") {
-            value[mapping[key]] = rate;
-          } else if (key === "key") {
-            continue;
-          } else {
-            value[mapping[key]] = val[key];
+      if (this.id === "user-base") {
+        this.cardList.itemList.forEach((i) => {
+          total += i.visTime;
+        });
+        this.total = total;
+        this.cardList.itemList.forEach((val) => {
+          let value = {};
+          let rate = (val.succRate * 100).toFixed(2) + "%";
+          for (let key in val) {
+            if (key === "succRate") {
+              value[mapping[key]] = rate;
+            } else if (key === "key") {
+              continue;
+            } else {
+              value[mapping[key]] = val[key];
+            }
           }
-        }
-        value["占比"] = ((val.docPV / total) * 100).toFixed(2) + "%";
-        let obj = {
-          value: val.docPV,
-          name: val.key,
-          tooltip: value
-        };
-        data.push(obj);
-      });
+          value["占比"] = ((val.visTime / total) * 100).toFixed(2) + "%";
+          let obj = {
+            value: val.visTime,
+            name: val.key,
+            tooltip: value
+          };
+          data.push(obj);
+        });
+      } else {
+        this.cardList.itemList.forEach((i) => {
+          total += i.docPV;
+        });
+        this.total = total;
+        this.cardList.itemList.forEach((val) => {
+          let value = {};
+          let rate = (val.succRate * 100).toFixed(2) + "%";
+          for (let key in val) {
+            if (key === "succRate") {
+              value[mapping[key]] = rate;
+            } else if (key === "key") {
+              continue;
+            } else {
+              value[mapping[key]] = val[key];
+            }
+          }
+          value["占比"] = ((val.docPV / total) * 100).toFixed(2) + "%";
+          let obj = {
+            value: val.docPV,
+            name: val.key,
+            tooltip: value
+          };
+          data.push(obj);
+        });
+      }
 
       this.seriesData = data;
       // console.log(data);

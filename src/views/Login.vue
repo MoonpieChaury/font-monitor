@@ -59,6 +59,7 @@
 
 <script>
 import bgAnimation from "@/components/bgAnimation";
+import { getUserData } from "@/utils/requests";
 
 export default {
   name: "Login",
@@ -75,9 +76,8 @@ export default {
       return !(this.userName && this.userPwd);
     }
   },
-  created() {
-  },
   mounted() {
+    // this.getData();
   },
   methods: {
     login() {
@@ -91,10 +91,35 @@ export default {
       this.confirm();
     },
     confirm() {
+      this.getData();
       localStorage.setItem("user", this.userName);
       localStorage.setItem("token", "limolstoken");
       this.visible = false;
-      console.log("点击确定");
+      // console.log("点击确定");
+    },
+    async getData() {
+      const res = await getUserData();
+      let datas = {};
+      if (res.code == 200) {
+        // console.log(res.data, ' try mock js call')
+        datas = res.data;
+      }
+      // let  = res;
+      let item = [];
+      // console.log(datas);
+      for (let data of datas) {
+        // console.log(data);
+        item.push([
+          data.uid[1],
+          data.date[1],
+          data.ip[1],
+          data.locale[1]
+        ]);
+      }
+      // this.listData = item;
+      // this.pageSize = this.listData.length;
+      localStorage.setItem("userAnalysis", JSON.stringify(item));
+      // console.log(item , 'logiin');
     }
   }
 };

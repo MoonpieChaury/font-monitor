@@ -38,6 +38,7 @@
         </div>
       </div>
       <!--   js错误页面的-->
+      <!--      todo js错误堆栈展示（缺数据）-->
       <div v-if="errType==='jsDetailData'" class="detail-custom-wrap">
         <div class="detail-content">
           <div class="detail-content-head">{{ pageData.content[0] }}</div>
@@ -159,6 +160,7 @@ export default {
   methods: {
     init() {
       this.pageName = this.$route.name;
+      //如果是用户分析就直接不展示前往路径按钮
       this.showUser = this.$route.name === "userAnalysis" ? false : true;
       this.errType = this.detailType;
       this.getData();

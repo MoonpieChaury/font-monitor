@@ -32,9 +32,26 @@ const getResourceData = function() {
   });
 };
 
+
+const getUserData = function() {
+  return request({
+    url: "/userAnalysData/userData",
+    method: "get"
+  });
+};
+
+const getUserPath = function() {
+  return request({
+    url: "/userAnalysData/userPath",
+    method: "get"
+  });
+};
+
 export {
   getApiData,
   getPageData,
   getJsData,
-  getResourceData
+  getResourceData,
+  getUserData,
+  getUserPath
 };

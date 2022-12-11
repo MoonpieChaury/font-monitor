@@ -6,6 +6,7 @@ import { pageData } from "./pageInfoData";
 import { apiErrData } from "./apiData";
 import { jsData } from "@/mock/jsErrorData";
 import { resourceData } from "@/mock/resourceData";
+import { userData } from "@/mock/userAnalysData";
 
 
 Mock.mock("/mock/pageInfoData/pageData", {
@@ -27,4 +28,14 @@ Mock.mock("/mock/jsErrorData/jsData", {
 Mock.mock("/mock/resourceData/resData", {
   code: 200,
   data: resourceData
+});
+
+Mock.mock("/mock/userAnalysData/userData", {
+  code: 200,
+  data: userData.userLog
+});
+
+Mock.mock("/mock/userAnalysData/userPath", {
+  code: 200,
+  data: userData.userPath
 });

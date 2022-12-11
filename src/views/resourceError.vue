@@ -129,7 +129,7 @@ import BarCard from "@/components/barCard";
 //   resourceNetwork,
 //   resourceType,
 // } from "@/mock/resourceData";
-import { getJsData, getResourceData } from "@/utils/requests";
+import { getResourceData } from "@/utils/requests";
 import { getDetailInfo } from "@/utils/utils";
 
 export default {

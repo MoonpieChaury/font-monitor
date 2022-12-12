@@ -23,7 +23,38 @@
         >
       </div>
     </div>
-    <div v-bind:id="id" class="bar-card-charts"></div>
+    <div>
+      <div class="bar-card-content">
+        <div v-show="listDis" class="bar-card-list">
+          <div class="list-head-wrap">
+            <div class="list-item-type">{{ listHead[0] }}</div>
+            <div class="list-item-content">{{ listHead[1] }}</div>
+            <div class="list-item-rate">{{ listHead[2] }}</div>
+            <div class="list-item-action">{{ listHead[3] }}</div>
+          </div>
+          <div v-if="listData.length" class="list-content">
+            <div v-for="(item , index) in listData" :key="index" class="list-content-item">
+              <div class="list-item-type">{{ item[0] }}</div>
+              <div class="list-item-content">{{ item[1] }}</div>
+              <div class="list-item-rate">{{ item[2] }}</div>
+              <div class="list-item-action">
+                <Button
+                  size="small"
+                  type="primary"
+                >筛选
+                </Button
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        <div v-show="barDis">
+          <div v-bind:id="id" class="bar-card-charts">
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
 </template>
 
@@ -45,6 +76,8 @@ export default {
     return {
       options: [],
       seriesData: [],
+      listHead: [],
+      listData: [],
       total: 0,
       barDis: true,
       listDis: false
@@ -53,20 +86,19 @@ export default {
   methods: {
     init() {
       this.formatData();
+      // this.formatListData();
       this.setOption();
       let dom = document.getElementById(this.id);
       let mychart = this.$echarts.init(dom);
-      // console.log(dom , mychart , this.options);
       mychart.clear();
-      // window.addEventListener('resize' , function (){
-      //   mychart.resize();
-      // });
       mychart.setOption(this.options);
     },
     setOption() {
       let label = "";
       if (this.id === "user-base") {
         label = "{name|总时长(min)}";
+      } else if (this.id.match("page")) {
+        label = "{name|完全加载(ms)}";
       } else {
         label = "{name|总次数(次)}";
       }
@@ -164,14 +196,7 @@ export default {
     // }
     formatData() {
       // let value = {};
-      let data = [],
-        total = 0;
-      const mapping = {
-        succPV: "成功次数",
-        docPV: "次数",
-        succRate: "成功率",
-        visTime: "停留时间"
-      };
+      let data = [], total = 0, listData = [], listHead = [];
       if (!this.cardList.itemList) {
         return;
       }
@@ -181,24 +206,39 @@ export default {
         });
         this.total = total;
         this.cardList.itemList.forEach((val) => {
-          let value = {};
-          let rate = (val.succRate * 100).toFixed(2) + "%";
-          for (let key in val) {
-            if (key === "succRate") {
-              value[mapping[key]] = rate;
-            } else if (key === "key") {
-              continue;
-            } else {
-              value[mapping[key]] = val[key];
-            }
-          }
-          value["占比"] = ((val.visTime / total) * 100).toFixed(2) + "%";
+          let value = {},
+            rate = ((val.visTime / total) * 100).toFixed(2);
+          value["停留时间"] = val.visTime + " min";
+          value["占比"] = rate + " %";
           let obj = {
             value: val.visTime,
             name: val.key,
             tooltip: value
           };
           data.push(obj);
+          listHead = [this.cardList.title, "停留时间(min)", "占比(%)", "操作"];
+          listData.push([val.key, val.visTime, rate]);
+        });
+      } else if (this.id.match("page")) {
+        this.cardList.itemList.forEach((i) => {
+          total += i.t2;
+        });
+        //因为page要算总的加载时间的平均时长
+        let len = Object.keys(this.cardList.itemList).length;
+        total = Math.floor(total / len);
+        this.total = total;
+        this.cardList.itemList.forEach((val) => {
+          let value = {}, rate = ((val.t2 / total) * 100).toFixed(2);
+          value["页面完全加载时长"] = val.t2 + " ms";
+          value["占比"] = rate + " %";
+          let obj = {
+            value: val.t2,
+            name: val.key,
+            tooltip: value
+          };
+          data.push(obj);
+          listHead = [this.cardList.title, "页面完全加载时长(ms)", "占比(%)", "操作"];
+          listData.push([val.key, val.t2, rate]);
         });
       } else {
         this.cardList.itemList.forEach((i) => {
@@ -206,29 +246,22 @@ export default {
         });
         this.total = total;
         this.cardList.itemList.forEach((val) => {
-          let value = {};
-          let rate = (val.succRate * 100).toFixed(2) + "%";
-          for (let key in val) {
-            if (key === "succRate") {
-              value[mapping[key]] = rate;
-            } else if (key === "key") {
-              continue;
-            } else {
-              value[mapping[key]] = val[key];
-            }
-          }
-          value["占比"] = ((val.docPV / total) * 100).toFixed(2) + "%";
+          let value = {}, rate = ((val.docPV / total) * 100).toFixed(2);
+          value["次数"] = val.docPV + " 次";
+          value["占比"] = rate + " %";
           let obj = {
             value: val.docPV,
             name: val.key,
             tooltip: value
           };
           data.push(obj);
+          listHead = [this.cardList.title, "次数(次)", "占比(%)", "操作"];
+          listData.push([val.key, val.docPV, rate]);
         });
       }
-
       this.seriesData = data;
-      // console.log(data);
+      this.listHead = listHead;
+      this.listData = listData;
     },
     changeChart(type) {
       if (type === "list") {
@@ -281,6 +314,59 @@ export default {
     width: 640px;
     height: 420px;
     margin-top: -25px;
+  }
+
+  .bar-card-list {
+    height: 420px;
+    color: @tit-color;
+    font-size: 16px;
+    padding-top: 20px;
+    border-radius: 8px;
+
+    .list-head-wrap {
+      background-color: @list-head;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      font-size: 18px;
+      font-weight: 500;
+      color: @font-color;
+      border-radius: 8px;
+    }
+
+    .list-content {
+      .list-content-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px;
+        border-bottom: 1px solid @tit-color;
+      }
+
+      .list-content-item:last-child {
+        border-bottom: transparent;
+      }
+    }
+
+    .list-item-type {
+      flex: 1;
+      margin-right: 30px;
+    }
+
+    .list-item-content {
+      width: 15%;
+      margin-right: 30px;
+    }
+
+    .list-item-rate {
+      width: 15%;
+      margin-right: 30px;
+    }
+
+    .list-item-action {
+      width: 7%;
+    }
   }
 }
 </style>

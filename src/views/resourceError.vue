@@ -62,6 +62,7 @@
           <div class="list-item-uv">{{ item.docUV }}</div>
           <Button class="detail" @click="checkLog">查看</Button>
         </div>
+        <Page :total="pageSize" show-sizer show-total />
       </div>
       <div class="error-frequent">
         <div class="erList-head">
@@ -105,11 +106,13 @@
           <div class="list-item-uv">{{ item.docUV }}</div>
           <Button class="detail" @click="checkLog">查看</Button>
         </div>
+        <Page :total="pageSize" show-sizer show-total />
       </div>
     </div>
     <div class="resource-cards-data">
       <bar-card :id="'resource-status'" :card-list="type"></bar-card>
       <bar-card :id="'resource-net'" :card-list="network"></bar-card>
+      <bar-card :id="'resource-browser'" :card-list="browser"></bar-card>
     </div>
     <Dialog v-if="visi" ref="resDialog" :type="'resDetailData'"></Dialog>
   </div>
@@ -121,16 +124,10 @@ import barLine from "@/components/jsLine";
 import timeSelect from "@/components/timeSelect";
 import Dialog from "@/components/dialog";
 import BarCard from "@/components/barCard";
-// import {apiListHead, apiList} from "@/mock/apiData";
-// import {
-//   resourceToday,
-//   resourceWeek,
-//   resourceList,
-//   resourceNetwork,
-//   resourceType,
-// } from "@/mock/resourceData";
 import { getResourceData } from "@/utils/requests";
 import { getDetailInfo } from "@/utils/utils";
+import { Page } from "view-design";
+
 
 export default {
   components: {
@@ -138,16 +135,14 @@ export default {
     timeSelect,
     barLine,
     Dialog,
-    // list,
-    BarCard
-    // Table,
-    // Page,
-    // Button,
+    BarCard,
+    Page
   },
   data() {
     return {
       cardList: [],
       tabActive: "apiOverview",
+      pageSize: 10,
 
       // error datas
       error: {},
@@ -163,7 +158,8 @@ export default {
 
       //cardList data
       network: [],
-      type: []
+      type: [],
+      browser: []
     };
   },
   methods: {
@@ -184,6 +180,7 @@ export default {
       this.errorList = data.resourceList.itemList;
       this.network = data.resourceNetwork;
       this.type = data.resourceType;
+      this.browser = data.resourceBrowser;
       this.detail = data.resourceDetail;
       this.getErrorData(this.today);
       // this.getErrorList();
@@ -416,6 +413,65 @@ export default {
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
+  }
+}
+</style>
+
+
+<style lang="less">
+.resourceError-page {
+  .ivu-page {
+    margin-top: 16px;
+    display: flex;
+    justify-content: flex-end;
+    color: @tit-color;
+
+    .ivu-page-prev,
+    .ivu-page-next,
+    .ivu-select-selection {
+      background-color: @comp-back;
+      border: none;
+      color: @font-color;
+
+      a {
+        color: @font-color;
+      }
+    }
+
+    .ivu-page-item {
+      background-color: @comp-back;
+      border: none;
+
+      a {
+        font-size: 14px;
+        color: @font-color;
+      }
+    }
+
+    .ivu-page-item-active {
+      background-color: @high-light-blue;
+      //border: none;
+      a {
+        color: @comp-back;
+        font-weight: bold;
+      }
+    }
+
+    .ivu-select-dropdown {
+      background-color: @comp-back;
+      border: 1px solid @body-back;
+      padding-top: 0;
+      padding-bottom: 0;
+
+      .ivu-select-item {
+        color: @tit-color;
+        border-bottom: 1px solid @body-back;
+      }
+
+      .ivu-select-item-selected {
+        color: @high-light-blue;
+      }
+    }
   }
 }
 </style>

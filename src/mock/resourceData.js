@@ -1644,6 +1644,36 @@ const resourceType = {
   ]
 };
 
+const resourceBrowser = {
+  title: "浏览器类型",
+  itemList: [
+    {
+      docPV: 612,
+      key: "chrome"
+    },
+    {
+      docPV: 845,
+      key: "safari"
+    },
+    {
+      docPV: 282,
+      key: "wechat"
+    },
+    {
+      docPV: 28,
+      key: "uni-app appservice"
+    },
+    {
+      docPV: 269,
+      key: "firefox"
+    },
+    {
+      docPV: 23,
+      key: "edge"
+    }
+  ]
+};
+
 const resourceData = {
   resourceCardList,
   resourceDetail,
@@ -1652,7 +1682,8 @@ const resourceData = {
   resourceList,
   resourceListHead,
   resourceNetwork,
-  resourceType
+  resourceType,
+  resourceBrowser
 };
 
 export { resourceData };

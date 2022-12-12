@@ -170,8 +170,16 @@ export default {
       this.len = Object.keys(this.pageData).length;
     },
     goUserAnalyst() {
-      //去详情页就保存当前查看的用户信息，到那边再取出来
-      localStorage.setItem("userAnalyst", JSON.stringify(this.pageData));
+      // //去详情页就保存当前查看的用户信息，到那边再取出来
+      // localStorage.setItem("userAnalyst", JSON.stringify(this.pageData));
+      this.$router.push({
+        path: "/userAnalysis",
+        name: "userAnalysis",
+        params: {
+          uid: this.pageData.uid[1],
+          date: this.pageData.date[1]
+        }
+      });
     }
   },
   mounted() {

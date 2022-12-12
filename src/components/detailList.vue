@@ -108,15 +108,13 @@ export default {
         ]);
       }
       this.listDataAll = item;
-      // this.listData = item;
       this.pageSize = this.listDataAll.length;
-      // console.log(this.listData,'getlist成功');
     },
     changePage(index) {
       let end = Math.min(index * 10, this.pageSize);
       let start = index * 10 - 10;
       this.listData = this.listDataAll.slice(start, end);
-      console.log(start, end, this.listData);
+      // console.log(start, end, this.listData);
     },
     //折叠和翻转
     showHide(index) {
@@ -130,7 +128,9 @@ export default {
       }
     },
     goUserPath(index) {
-      this.$emit("changeTab");
+      let uid = this.listData[index][0], date = this.listData[index][1];
+      this.$emit("goPath", uid, date);
+      // console.log(uid , date);
     }
   },
   mounted() {

@@ -4,12 +4,13 @@
     <div class="search-header">
       <div class="search-input">
         <div class="user-input-wrap">
-          <Input v-model="value" placeholder="请输入用户ID查找"></Input>
+          <Input v-model="uid" placeholder="请输入用户ID查找"></Input>
         </div>
         <div class="date-input-wrap">
           <Date-picker
             placeholder="选择日期和时间"
             type="datetime"
+            v-model="date"
           ></Date-picker>
         </div>
         <div class="date-input-search-btn">
@@ -37,6 +38,7 @@
     <detail-list
       v-if="tabActive === 'log'"
       :detail-type="'userAnalysis'"
+      @goPath="goUserPath"
     ></detail-list>
     <div v-else class="user-path-container">
       <div class="user-path-base-container">
@@ -114,19 +116,26 @@ export default {
   data() {
     return {
       value: "",
-      tabActive: "path",
+      tabActive: "log",
       visitTime: [],
       userInfo: [],
       userPath: {},
       pathList: [],
-      len: 0
+      len: 0,
+      uid: "",
+      date: ""
     };
   },
   methods: {
     changeTab(val) {
       this.tabActive = val;
+
     },
     init() {
+      if (this.$route.params.uid) {
+        let pa = this.$route.params;
+        this.goUserPath(pa.uid, pa.date);
+      }
       this.getUserData();
     },
 
@@ -150,7 +159,7 @@ export default {
         if (val.type === "js") {
           let stack = val.err_stack.split("at ");
           stack.shift();
-          console.log(stack);
+          // console.log(stack);
           listHead = [val.icon, "JS错误", val.err_content, val.time];
           listContent.push(["状态码", val.code]);
           listContent.push(["错误堆栈", stack]);
@@ -179,7 +188,7 @@ export default {
         });
       });
       this.len = Object.keys(this.pathList).length;
-      console.log(this.pathList);
+      // console.log(this.pathList);
     },
     showHide(index) {
       // console.log(index);
@@ -190,6 +199,11 @@ export default {
         this.$refs.contentDetail[index].style.display = "none";
         this.$refs.userArrow[index].style.transform = "rotate(0deg)";
       }
+    },
+    goUserPath(uid, date) {
+      this.tabActive = "path";
+      this.uid = uid;
+      this.date = date;
     }
   },
   mounted() {

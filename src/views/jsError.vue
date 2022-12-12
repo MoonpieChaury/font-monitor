@@ -58,6 +58,7 @@
           <div class="list-item-uv">{{ item.docUV }}</div>
           <Button class="detail" @click="checkLog">查看</Button>
         </div>
+        <Page :total="pageSize" show-sizer show-total />
       </div>
       <div class="error-frequent">
         <div class="erList-head">
@@ -85,6 +86,7 @@
           <div class="list-item-uv">{{ item.docUV }}</div>
           <Button class="detail" @click="checkLog">查看</Button>
         </div>
+        <Page :total="pageSize" show-sizer show-total />
       </div>
     </div>
 
@@ -103,9 +105,9 @@
 import cardList from "@/components/cardList";
 import timeSelect from "@/components/timeSelect";
 import barCard from "@/components/barCard";
-// import {jsErrToday, jsErrWeek, jsErrorList, jsNetwork, jsBrowser, jsSystem} from "@/mock/jsErrorData";
 import jsLine from "@/components/jsLine";
 import Dialog from "@/components/dialog";
+import { Page } from "view-design";
 import { getJsData } from "@/utils/requests";
 import { getDetailInfo } from "@/utils/utils";
 
@@ -115,7 +117,8 @@ export default {
     timeSelect,
     jsLine,
     barCard,
-    Dialog
+    Dialog,
+    Page
   },
   data() {
     return {
@@ -123,6 +126,7 @@ export default {
       tabActive: "overview",
       //控制弹窗出现
       visi: false,
+      pageSize: 5,
 
       //js error datas
       error: {},
@@ -209,7 +213,7 @@ export default {
         yPage: todayPage,
         yUser: todayUser
       };
-      console.log(this.error, "errorlist");
+      // console.log(this.error, "errorlist");
     },
     getErrorList() {
       // if(!this.errorList)
@@ -388,6 +392,65 @@ export default {
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
+  }
+}
+</style>
+
+
+<style lang="less">
+.jsError-page {
+  .ivu-page {
+    margin-top: 16px;
+    display: flex;
+    justify-content: flex-end;
+    color: @tit-color;
+
+    .ivu-page-prev,
+    .ivu-page-next,
+    .ivu-select-selection {
+      background-color: @comp-back;
+      border: none;
+      color: @font-color;
+
+      a {
+        color: @font-color;
+      }
+    }
+
+    .ivu-page-item {
+      background-color: @comp-back;
+      border: none;
+
+      a {
+        font-size: 14px;
+        color: @font-color;
+      }
+    }
+
+    .ivu-page-item-active {
+      background-color: @high-light-blue;
+      //border: none;
+      a {
+        color: @comp-back;
+        font-weight: bold;
+      }
+    }
+
+    .ivu-select-dropdown {
+      background-color: @comp-back;
+      border: 1px solid @body-back;
+      padding-top: 0;
+      padding-bottom: 0;
+
+      .ivu-select-item {
+        color: @tit-color;
+        border-bottom: 1px solid @body-back;
+      }
+
+      .ivu-select-item-selected {
+        color: @high-light-blue;
+      }
+    }
   }
 }
 </style>

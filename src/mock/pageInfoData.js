@@ -574,14 +574,17 @@ const pageSystem = {
   itemList: [
     {
       docPV: 446,
+      t2: 227,
       key: "mac os x"
     },
     {
       docPV: 320,
+      t2: 1277,
       key: "windows"
     },
     {
       docPV: 563,
+      t2: 683,
       key: "android"
     }
   ]
@@ -592,26 +595,32 @@ const pageBrowser = {
   itemList: [
     {
       docPV: 612,
+      t2: 1273,
       key: "chrome"
     },
     {
       docPV: 845,
+      t2: 2371,
       key: "safari"
     },
     {
       docPV: 282,
+      t2: 3342,
       key: "wechat"
     },
     {
       docPV: 28,
+      t2: 1837,
       key: "uni-app appservice"
     },
     {
       docPV: 269,
+      t2: 1527,
       key: "firefox"
     },
     {
       docPV: 23,
+      t2: 1277,
       key: "edge"
     }
   ]
